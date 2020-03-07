@@ -31,6 +31,4 @@ if __name__ == '__main__':
 
 
 
-    # changed 3-6-2020
-
-    # again? let's do this....
+    # another day for progress 2/7/2020 - carlosa a marin

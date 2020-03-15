@@ -24,6 +24,8 @@ class Product(Model):
     class Meta:
         database = db
 
+dog = 'Charlie'
+
 
 if __name__ == '__main__':
     db.connect()

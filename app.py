@@ -50,16 +50,16 @@ def add_products():
             price = product.get('product_price')
             valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", price)
             if valid_price_entry:
-                numbers = re.compile(r"[^\d]+") # Where should this go?
+                numbers = re.compile(r"[^\d]+") ## sets "numbers" every time we loop thru a product. where would be better placement?
                 digits_only_price = numbers.sub("", price)
             else:
                 raise TypeError()
         except TypeError:
             digits_only_price = 0
-        # duplicate name found!
-        if not product_record[1]:
+        ## duplicate name found!
+        if not product_record[1]: ## is there a better way to write this condition?
             # compare dates
-            # the most recent date is the winner!
+            # the most recent date is the Record that shall be saved!
             pass
         # finalizing changes
         product_record[0].product_quantity = quantity

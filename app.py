@@ -33,8 +33,19 @@ def add_products():
         # verifying date_update
         try:
             date = product.get('date_updated')
-            valid_date_entry = re.match(r"^(((0?[1-9]|1[012])/(0?[1-9]|1\d|2[0-8])|(0?[13456789]|1[012])/(29|30)|(0?[13578]|1[02])/31)/(19|[2-9]\d)\d{2}|0?2/29/((19|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([2468][048]|[3579][26])00)))$", date)
+            valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
+            print(f"{product['product_name']} | {date}")
+            print(f'is this a valid entry? {valid_date_entry}')
             if valid_date_entry:
+                object_created = product_record[1]
+                print(f'object crated? = {product_record[1]}')
+                print('')
+                if object_created: 
+                    pass # object is new
+                else:
+                    pass # object already exsist
+                #     if date < product_record[0].date_updated: 
+                #         date = product_record[0].date_updated
                 date_object = datetime.strptime(date, '%m/%d/%Y')
             else:
                 raise TypeError()
@@ -79,4 +90,3 @@ if __name__ == '__main__':
 
 
 # valid_price_entry regex by "Brian Orrell": http://regexlib.com/UserPatterns.aspx?authorId=f77b664d-b24a-4461-8e5f-8ea36aa47f58 (not secure connection)
-# valid_date_entry regex by "Dany Lauener": http://regexlib.com/UserPatterns.aspx?authorId=81355952-f53d-4142-bc5c-aab2beae19f3 (not secure conection)

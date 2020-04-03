@@ -41,8 +41,11 @@ def add_products():
                 print(f'object crated? = {product_record[1]}')
                 print('')
                 if object_created: 
-                    pass # object is new
+                    input('no similar products found.') # object is new
+                    print('-----------------------------------')
                 else:
+                    input('duplicate product found.') # object is new
+                    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
                     pass # object already exsist
                 #     if date < product_record[0].date_updated: 
                 #         date = product_record[0].date_updated
@@ -67,12 +70,6 @@ def add_products():
                 raise TypeError()
         except TypeError:
             digits_only_price = 0
-        ## duplicate name found!
-        if not product_record[1]: ## is there a better way to write this condition?
-            # compare dates
-            # the most recent date is the Record that shall be saved!
-            pass
-        # finalizing changes
         product_record[0].product_quantity = quantity
         product_record[0].product_price = digits_only_price
         product_record[0].date_updated = date_object

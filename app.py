@@ -30,36 +30,8 @@ def add_products():
     products = fetch_products_from_csv()
     for product in products:
         product_record = Product.get_or_create(product_name=product.get('product_name'))
-        # verifying date_update
-        try:
-            date = product.get('date_updated')
-            valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
-            print(f"{product['product_name']} | {date}")
-            print(f'is this a valid entry? {valid_date_entry}')
-            if valid_date_entry:
-                object_created = product_record[1]
-                print(f'object crated? = {product_record[1]}')
-                print('')
-                if object_created: 
-                    input('no similar products found.') # object is new
-                    print('-----------------------------------')
-                else:
-                    input('duplicate product found.') # object is new
-                    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
-                    pass # object already exsist
-                #     if date < product_record[0].date_updated: 
-                #         date = product_record[0].date_updated
-                date_object = datetime.strptime(date, '%m/%d/%Y')
-            else:
-                raise TypeError()
-        except TypeError:
-            date_object = 0
-        # verifying product_quantity
-        try:
-            quantity = int(product.get('product_quantity'))
-        except TypeError:
-            quantity = 0
-        # verifying product_price
+
+# verifying product_price
         try:
             price = product.get('product_price')
             valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", price)
@@ -70,6 +42,41 @@ def add_products():
                 raise TypeError()
         except TypeError:
             digits_only_price = 0
+
+# verifying product_quantity
+        try:
+            quantity = int(product.get('product_quantity'))
+        except TypeError:
+            quantity = 0
+
+ # verifying date_update
+        try:
+            date = product.get('date_updated')
+            valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
+            print(f"{product['product_name']} | {date}")
+            print(f'is this a valid entry? {valid_date_entry}')
+            if valid_date_entry:
+                object_created = product_record[1]
+                if object_created:
+                    pass 
+                    # input('no similar products found.') # object is new
+                    print('')
+                    print('-----------------------------------')
+                else:
+                    print('')
+                    print('duplicate product found.') # object is dupe
+                    input('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
+                    # COMPARE Date of x vs y.
+                    # if date < product_record[0].date_updated: 
+                    #     date = product_record[0].date_updated
+                    #     breakpoint()
+                date_object = datetime.strptime(date, '%m/%d/%Y')
+            else:
+                breakpoint()
+                raise TypeError()
+        except TypeError:
+            date_object = 0
+# saving data
         product_record[0].product_quantity = quantity
         product_record[0].product_price = digits_only_price
         product_record[0].date_updated = date_object

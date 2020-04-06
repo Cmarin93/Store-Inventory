@@ -24,13 +24,11 @@ class Product(Model):
     class Meta: #telling the model which database it belongs to.
         database = db
 
-
 def add_products():
     """Creates or updates every product"""
     products = fetch_products_from_csv()
     for product in products:
         product_record = Product.get_or_create(product_name=product.get('product_name'))
-
 # verifying product_price
         try:
             price = product.get('product_price')
@@ -51,7 +49,7 @@ def add_products():
 
  # verifying date_update
         try:
-            date = product.get('date_updated')
+            date = product.get('date_updated') # investigate
             valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
             print(f"{product['product_name']} | {date}")
             print(f'is this a valid entry? {valid_date_entry}')
@@ -61,21 +59,36 @@ def add_products():
                     pass 
                     # input('no similar products found.') # object is new
                     print('')
+                    print(f"New product! {product['product_name']}")
                     print('-----------------------------------')
                 else:
                     print('')
-                    print('duplicate product found.') # object is dupe
-                    input('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
+                    # print('duplicate product found.') # object is dupe
+                    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
+                    # input(f"date variable = {date}") # date means new input's date.
+                    # input(f"product_record[0].date_updated = {product_record[0].date_updated}") # means original date
+                    # input(f"product.get('date_updated') = {product.get('date_updated')}")
+                    # input('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
+                    
                     # COMPARE Date of x vs y.
-                    # if date < product_record[0].date_updated: 
-                    #     date = product_record[0].date_updated
+                    # x = product_record[0].date_updated
+                    # y = date
+                    #THIS IS THE BREAKPOINT:
+                    #   product_record[0].date_updated = datetime, date = str.
+                    if product_record[0].date_updated < date: # original date is less than new date.
+                        #update w/ new input's date
+                        date = product_record[0].date_updated
+                        input(f"{product_record[0].date_updated} < {date}")
+                    else: # original date is the more recent.
+                        date = product_record[0].date_updated
                     #     breakpoint()
                 date_object = datetime.strptime(date, '%m/%d/%Y')
             else:
-                breakpoint()
                 raise TypeError()
         except TypeError:
+            breakpoint()
             date_object = 0
+
 # saving data
         product_record[0].product_quantity = quantity
         product_record[0].product_price = digits_only_price
@@ -93,4 +106,4 @@ if __name__ == '__main__':
 
 
 
-# valid_price_entry regex by "Brian Orrell": http://regexlib.com/UserPatterns.aspx?authorId=f77b664d-b24a-4461-8e5f-8ea36aa47f58 (not secure connection)
+# 'valid_price_entry' regex by "Brian Orrell": http://regexlib.com/UserPatterns.aspx?authorId=f77b664d-b24a-4461-8e5f-8ea36aa47f58 (not secure connection)

@@ -34,7 +34,7 @@ def add_products():
             price = product.get('product_price')
             valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", price)
             if valid_price_entry:
-                numbers = re.compile(r"[^\d]+") ## sets "numbers" every time we loop thru a product. where would be better placement?
+                numbers = re.compile(r"[^\d]+")
                 digits_only_price = numbers.sub("", price)
             else:
                 raise TypeError()
@@ -49,40 +49,20 @@ def add_products():
 
  # verifying date_update
         try:
-            date = product.get('date_updated') # investigate
+            date = product.get('date_updated')
             valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
-            print(f"{product['product_name']} | {date}")
-            print(f'is this a valid entry? {valid_date_entry}')
             if valid_date_entry:
                 object_created = product_record[1]
                 if object_created:
-                    pass 
-                    # input('no similar products found.') # object is new
-                    print('')
-                    print(f"New product! {product['product_name']}")
-                    print('-----------------------------------')
-                else:
-                    print('')
-                    # print('duplicate product found.') # object is dupe
-                    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
-                    # input(f"date variable = {date}") # date means new input's date.
-                    # input(f"product_record[0].date_updated = {product_record[0].date_updated}") # means original date
-                    # input(f"product.get('date_updated') = {product.get('date_updated')}")
-                    # input('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_')
-                    
-                    # COMPARE Date of x vs y.
-                    # x = product_record[0].date_updated
-                    # y = date
-                    #THIS IS THE BREAKPOINT:
-                    #   product_record[0].date_updated = datetime, date = str.
-                    if product_record[0].date_updated < date: # original date is less than new date.
-                        #update w/ new input's date
+                    print(f"{product['product_name']} has been added to the database!")
+                else: # entry is a duplicate name.
+                    if product_record[0].date_updated < date: 
                         date = product_record[0].date_updated
+                        date_object = datetime.strptime(date, '%m/%d/%Y')
                         input(f"{product_record[0].date_updated} < {date}")
-                    else: # original date is the more recent.
+                    else: 
                         date = product_record[0].date_updated
-                    #     breakpoint()
-                date_object = datetime.strptime(date, '%m/%d/%Y')
+                        date_object = datetime.strptime(date, '%m/%d/%Y')
             else:
                 raise TypeError()
         except TypeError:
@@ -92,6 +72,7 @@ def add_products():
 # saving data
         product_record[0].product_quantity = quantity
         product_record[0].product_price = digits_only_price
+        breakpoint()
         product_record[0].date_updated = date_object
         product_record[0].save()
 

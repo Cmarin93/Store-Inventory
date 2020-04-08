@@ -15,54 +15,59 @@ def fetch_products_from_csv():
     return products
 
 class Product(Model):  
-    product_id = AutoField(unique=True)
-    product_name = CharField(max_length=75)
-    product_price = IntegerField(default=0)
-    product_quantity = IntegerField(default=0)
+    id = AutoField(unique=True)
+    name = CharField(max_length=75)
+    price = IntegerField(default=0)
+    quantity = IntegerField(default=0)
     date_updated = DateField(default=0)
 
     class Meta: #telling the model which database it belongs to.
         database = db
 
+
 def add_products():
     """Creates or updates every product"""
-    products = fetch_products_from_csv()
-    for product in products:
-        product_record = Product.get_or_create(product_name=product.get('product_name'))
+    product_enteries = fetch_products_from_csv()
+    for entry in product_enteries:
+        product_record = Product.get_or_create(name=entry.get('name'))
+
 # verifying product_price
         try:
-            price = product.get('product_price')
-            valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", price)
+            valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", entry['price'])
             if valid_price_entry:
-                numbers = re.compile(r"[^\d]+")
-                digits_only_price = numbers.sub("", price)
+                digit_regex = re.compile(r"[^\d]+") # refector?
+                price = digit_regex.sub("", entry['price'])
             else:
                 raise TypeError()
         except TypeError:
-            digits_only_price = 0
+            price = 0
 
 # verifying product_quantity
         try:
-            quantity = int(product.get('product_quantity'))
+            quantity = int(entry['quantity'])
         except TypeError:
             quantity = 0
 
  # verifying date_update
         try:
-            date = product.get('date_updated')
-            valid_date_entry = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", date))
-            if valid_date_entry:
-                object_created = product_record[1]
-                if object_created:
-                    print(f"{product['product_name']} has been added to the database!")
-                else: # entry is a duplicate name.
-                    if product_record[0].date_updated < date: 
+            valid_date = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", entry['date_updated']))
+            if valid_date:
+                new_record = product_record[1]
+                if new_record:
+                    print(f"{entry['name']} has been added to the database!")
+                else: 
+                    breakpoint()
+                    # I need to reinstate this condition
+                    if entry["date_updated"] < date: # questionable condition
+                        # type(entry["date_updated"]) = <class 'str'>
+                        # type(product_record[0].date_updated) = <class 'int'>
                         date = product_record[0].date_updated
                         date_object = datetime.strptime(date, '%m/%d/%Y')
                         input(f"{product_record[0].date_updated} < {date}")
                     else: 
                         date = product_record[0].date_updated
                         date_object = datetime.strptime(date, '%m/%d/%Y')
+                date_object = datetime.strptime(date, '%m/%d/%Y')
             else:
                 raise TypeError()
         except TypeError:
@@ -70,9 +75,9 @@ def add_products():
             date_object = 0
 
 # saving data
-        product_record[0].product_quantity = quantity
-        product_record[0].product_price = digits_only_price
-        breakpoint()
+        product_record[0].quantity = quantity
+        product_record[0].price = price
+        #breakpoint()
         product_record[0].date_updated = date_object
         product_record[0].save()
 

@@ -14,6 +14,11 @@ def fetch_products_from_csv():
         products = list(csv.DictReader(csvfile)) 
     return products
 
+
+
+# ERROR WITH LOGIC:  1. The date needs to determine what data shall be saved into the DB.
+#             Hypo:  2. When looping thru entries - the rest of entires data overides the records data.
+
 class Product(Model):  
     id = AutoField(unique=True)
     name = CharField(max_length=75)
@@ -33,53 +38,55 @@ def add_products():
 
 # verifying product_price
         try:
+            print('')
             valid_price_entry = re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", entry['price'])
             if valid_price_entry:
-                digit_regex = re.compile(r"[^\d]+") # refector?
+                digit_regex = re.compile(r"[^\d]+")
                 price = digit_regex.sub("", entry['price'])
             else:
                 raise TypeError()
         except TypeError:
             price = 0
-
+        product_record[0].price = price
 # verifying product_quantity
         try:
             quantity = int(entry['quantity'])
         except TypeError:
             quantity = 0
-
+        product_record[0].quantity = quantity
  # verifying date_update
         try:
-            valid_date = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", entry['date_updated']))
-            if valid_date:
-                new_record = product_record[1]
-                if new_record:
+            finalDate = product_record[0].date_updated
+            isValidDate = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", entry['date_updated'])) 
+            if isValidDate:
+                isNewProduct = product_record[1]
+                if isNewProduct:
+                    finalDate = datetime.strptime(entry['date_updated'], '%m/%d/%Y').date()
                     print(f"{entry['name']} has been added to the database!")
-                else: 
-                    breakpoint()
-                    # I need to reinstate this condition
-                    if entry["date_updated"] < date: # questionable condition
-                        # type(entry["date_updated"]) = <class 'str'>
-                        # type(product_record[0].date_updated) = <class 'int'>
-                        date = product_record[0].date_updated
-                        date_object = datetime.strptime(date, '%m/%d/%Y')
-                        input(f"{product_record[0].date_updated} < {date}")
-                    else: 
-                        date = product_record[0].date_updated
-                        date_object = datetime.strptime(date, '%m/%d/%Y')
-                date_object = datetime.strptime(date, '%m/%d/%Y')
+                else:
+                    record_date = product_record[0].date_updated
+                    entry_date = datetime.strptime(entry['date_updated'], '%m/%d/%Y').date()
+                    finalDate = greater_then_date(record_date, entry_date)
+                    print(f"{entry['name']} has been updated!")
             else:
                 raise TypeError()
-        except TypeError:
-            breakpoint()
+        except TypeError as e:
             date_object = 0
-
-# saving data
-        product_record[0].quantity = quantity
-        product_record[0].price = price
-        #breakpoint()
-        product_record[0].date_updated = date_object
+        product_record[0].date_updated = finalDate
         product_record[0].save()
+    print('')
+
+
+def verify_date(record, entry):
+    pass
+
+
+def greater_then_date(record, entry):
+    if record > entry:
+        greater_date = record
+    else:
+        greater_date = entry
+    return greater_date
 
 
 if __name__ == '__main__':
@@ -93,3 +100,8 @@ if __name__ == '__main__':
 
 
 # 'valid_price_entry' regex by "Brian Orrell": http://regexlib.com/UserPatterns.aspx?authorId=f77b664d-b24a-4461-8e5f-8ea36aa47f58 (not secure connection)
+
+# notes about 'valid price entry':
+# '$0.00' = '000'
+
+

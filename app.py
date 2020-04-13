@@ -72,7 +72,7 @@ def compare_entry_with_records():
     pass
 
 
-def import_csv():
+def import_products():
     """Creates or updates every product"""
     productEntries = fetch_products_from_csv()
     for entry in productEntries:
@@ -99,6 +99,6 @@ def import_csv():
 if __name__ == '__main__':
     db.connect()
     db.create_tables([Product], safe=True) # Structure of table is set-up, but no data is inserted.
-    import_csv()
+    import_products()
     db.close()
 

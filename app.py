@@ -30,73 +30,72 @@ class Product(Model):
     class Meta: #telling the model which database it belongs to.
         database = db
 
-# CURRENTLY: researching how to skip an iteration of an entry that has been rejected.
+
+def convert_price(entry):
+    digit_dissection = re.compile(r"[^\d]+")
+    price_reformed = digit_dissection.sub("", entry['price'])
+    entry['price'] = price_reformed
+
 def verify_product_data(entry):
-    validate_date(entry)
+    print("")
     validate_price(entry)
     validate_quantity(entry)
-
-
-def validate_date(entry):
-    try:
-        isValidDate = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", entry['date_updated']))
-        if isValidDate:
-            print(f"{entry['name']} | {entry['date_updated']}") # NAME | DATE
-        else:
-            raise ValueError()
-    except ValueError:
-        input(f"{entry['name']}: Invalid date.")
-        breakpoint()
+    validate_date(entry)
+    print("")
+# DESIGN QUESTION: Should I convert fields within the validation on the entry?
 
 def validate_price(entry):
-    try:
-        isValidPrice = bool(re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", entry['price']))
-        if isValidPrice:
-            print(f"Price: {entry['price']}")
-        else:
-            raise TypeError()
-    except TypeError:
-        input(f"{entry['name']}: Invalid price")
-        #continue
+    isValidPrice = bool(re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", entry['price']))
+    if isValidPrice:
+        convert_price(entry)
+    else:
+        raise TypeError()
 
 def validate_quantity(entry):
     try:
         int(entry['quantity'])
         print(f"Qty: {entry['quantity']}")
-        input("")
     except TypeError:
-        print(f"{entry['name']}: Invalid quantity.")
-        input("")
-        #continue
+        print("Invalid quantity")
+        raise TypeError()
+
+def validate_date(entry):
+    """Validates entries date"""
+    isValidDate = bool(re.match(r"[\d]{1,2}/[\d]{1,2}/[\d]{4}", entry['date_updated']))
+    if isValidDate:
+        print(f"{entry['name']} was entered into the system on {entry['date_updated']}") 
+    else:
+        raise ValueError()
 
 
-# WRITE: CONVERT_DATA or Implement data into validation.
+def compare_entry_with_records():
+    pass
 
 
-
-
-def add_products():
+def import_csv():
     """Creates or updates every product"""
-    product_enteries = fetch_products_from_csv()
-    for entry in product_enteries:
-        verify_product_data(entry)
-        # I do not understand this function completely.
-        product_record = Product.get_or_create(name=entry['name'], date_updated=entry['date_updated']) # mapping of field names to value.
+    productEntries = fetch_products_from_csv()
+    for entry in productEntries:
+        try:
+            verify_product_data(entry)
+            #
+            # attempt to get record w/ same name + date.
+            # if found: rewrite, price + quantity. 
+            # if not found: create new record.
+            breakpoint()
+            # This format imports only name (all other values = 0)
+            product_record = Product.get_or_create(name=entry['name']) # mapping of field names to value.
+            # This format will place dulicates.
+            product_record2 = Product.get_or_create(name=entry['name'], price=entry['price'], quantity=entry['quantity'], date_updated=entry['date_updated'])
+
+        except:
+            print(f"{entry['name']}: Invalid item.")
+            continue
 
 
 if __name__ == '__main__':
     db.connect()
     db.create_tables([Product], safe=True) # Structure of table is set-up, but no data is inserted.
-    add_products()
+    import_csv()
     db.close()
-
-
-
-                    # PRICE CONVERTION
-            # digit_dissection = re.compile(r"[^\d]+")
-            # price_reformed = digit_dissection.sub("", entry['price'])
-            # entry['price'] = price_reformed
-
-
-
 

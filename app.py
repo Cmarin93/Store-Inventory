@@ -53,6 +53,11 @@ def validate_date(entry):
 
 # Price
 
+def convert_price(entry):
+    digit_dissection = re.compile(r"[^\d]+") 
+    price_reformed = digit_dissection.sub("", entry['price']) 
+    entry['price'] = price_reformed
+
 def validate_price(entry):
     isValidPrice = bool(re.match(r"^\$?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$", entry['price']))
     if isValidPrice:
@@ -61,10 +66,6 @@ def validate_price(entry):
         print("Invalid Price.")
         raise TypeError()
 
-def convert_price(entry):
-    digit_dissection = re.compile(r"[^\d]+") 
-    price_reformed = digit_dissection.sub("", entry['price']) 
-    entry['price'] = price_reformed
 
 # Quantity
 

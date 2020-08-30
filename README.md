@@ -2,6 +2,6 @@
 ###### *This program is entirely console/terminal based.*
 
 ![Store Inventory](logo.png)
-![Preview]()
+![Preview](const.png)
 
         Created By: Carlos A. Marin - July 2019

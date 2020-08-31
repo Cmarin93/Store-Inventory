@@ -1,2 +1,0 @@
-dareutil==2.8.1
-peewee==3.9.4

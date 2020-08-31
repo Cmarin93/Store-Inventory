@@ -5,16 +5,16 @@ import csv
 import re
 from peewee import *
 
- # ETST
+
 db = SqliteDatabase('inventory.db')
 
 
 def fetch_products_from_csv():
     """ returns 'products' : a list of ordered dictionaries"""
     with open('inventory.csv', newline='') as csvfile:
-        products = list(csv.DictReader(csvfile)) 
-    return products
-
+        product_list = list(csv.DictReader(csvfile)) 
+        breakpoint()
+    return product_list
 
 
 # ERROR WITH LOGIC:  1. The date needs to determine what data shall be saved into the DB.
@@ -26,7 +26,7 @@ class Product(Model):
     name = CharField(max_length=75, unique=True)
     price = IntegerField(default=0) 
     quantity = IntegerField(default=0)
-    date_updated = DateField(default=0) # replace default w/ datetime.date object?
+    date_updated = DateField(default=0) 
 
     class Meta: #telling the model which database it belongs to.
         database = db
@@ -94,6 +94,6 @@ def import_products():
 
 if __name__ == '__main__':
     db.connect()
-    db.create_tables([Product], safe=True) # Structure of table is set-up, but no data is inserted.
+    db.create_tables([Product], safe=True)
     import_products()
     db.close()
